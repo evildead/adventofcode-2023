@@ -2,9 +2,11 @@ import figlet from 'figlet';
 import { Xlogger, LogLevel } from './xlogger';
 import { AsciiArtLogger } from './asciiArtLogger';
 import { ConsoleLogger } from './consoleLogger';
+import { FileLogger } from './fileLogger';
 
 let xloggerAsciiArt: Xlogger;
 let xloggerConsole: Xlogger;
+let xloggerFile: Xlogger;
 
 export function availableFonts(printFonts: boolean = true) {
   const figletFonts = figlet.fontsSync();
@@ -35,4 +37,12 @@ export function getConsoleLogger(logLevel: LogLevel = 'info'): Xlogger {
     xloggerConsole = new Xlogger(logLevel, [consoleLogger]);
   }
   return xloggerConsole;
+}
+
+export function getFileLogger(logLevel: LogLevel = 'info', filePath: string): Xlogger {
+  if (!xloggerFile) {
+    const fileLogger = new FileLogger(filePath);
+    xloggerFile = new Xlogger(logLevel, [fileLogger]);
+  }
+  return xloggerFile;
 }
