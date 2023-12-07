@@ -1,4 +1,5 @@
 /* eslint-disable security/detect-object-injection */
+import { v4 as uuidv4 } from 'uuid';
 import { getAsciiArtLogger, getConsoleLogger, getFileLogger } from '../logger';
 import { getTextFileAsListOfLines, trimAny } from '../utilities';
 
@@ -99,10 +100,20 @@ export enum ElementType {
 
 class PartNumbersRetrieverSecondTry {
   private _mapOfElements: ElementType[][];
+  private _mapOfNumbers: Map<number, Map<number, [number, string]>>;
   private _engineByLines: Array<string>;
 
   constructor(engineByLines: Array<string>) {
     this.createMapOfElements(engineByLines);
+    this.createMapOfNumbers();
+  }
+
+  get mapOfElements(): ElementType[][] {
+    return this._mapOfElements;
+  }
+
+  get mapOfNumbers(): Map<number, Map<number, [number, string]>> {
+    return this._mapOfNumbers;
   }
 
   private createMapOfElements(engineByLines: Array<string>) {
@@ -126,15 +137,53 @@ class PartNumbersRetrieverSecondTry {
     }
   }
 
-  get mapOfElements(): ElementType[][] {
-    return this._mapOfElements;
+  private createMapOfNumbers() {
+    this._mapOfNumbers = new Map<number, Map<number, [number, string]>>();
+    for (let lineIndex = 0; lineIndex < this._mapOfElements.length; lineIndex++) {
+      const lineMapOfNumber = new Map<number, [number, string]>();
+      const currLine = this._engineByLines[lineIndex];
+      const currMapOfElements = this._mapOfElements[lineIndex];
+      let startCoordNum = 0;
+      let endCoordNum = 0;
+      let num = '';
+
+      for (let index = 0; index < currMapOfElements.length; index++) {
+        const element = currMapOfElements[index];
+        if (element === ElementType.IsNumber) {
+          if (num.length < 1) {
+            startCoordNum = Number(index);
+          }
+          num += currLine[index];
+          endCoordNum = Number(index);
+        } else {
+          if (num.length > 0) {
+            const currUuid = uuidv4();
+            for (let coord = startCoordNum; coord <= endCoordNum; coord++) {
+              lineMapOfNumber.set(Number(coord), [Number(num), currUuid]);
+            }
+            startCoordNum = 0;
+            endCoordNum = 0;
+            num = '';
+          }
+        }
+      }
+      if (num.length > 0) {
+        const currUuid = uuidv4();
+        for (let coord = startCoordNum; coord <= endCoordNum; coord++) {
+          lineMapOfNumber.set(Number(coord), [Number(num), currUuid]);
+        }
+        startCoordNum = 0;
+        endCoordNum = 0;
+        num = '';
+      }
+      this._mapOfNumbers.set(lineIndex, lineMapOfNumber);
+    }
   }
 
   public listPartNumbers(): Array<number> {
     const listOfPartNumbers: Array<number> = [];
 
     for (let lineIndex = 0; lineIndex < this._mapOfElements.length; lineIndex++) {
-      // const lineIndex = 4;
       const currLine = this._engineByLines[lineIndex];
       const currMapOfElements = this._mapOfElements[lineIndex];
       let startCoordNum = 0;
@@ -212,6 +261,46 @@ class PartNumbersRetrieverSecondTry {
     }
 
     return false;
+  }
+
+  public listGearRatios(): Array<[number, number]> {
+    const listOfGearRatios: Array<[number, number]> = [];
+
+    for (let lineIndex = 0; lineIndex < this._engineByLines.length; lineIndex++) {
+      const currLine = this._engineByLines[lineIndex];
+      for (let index = 0; index < currLine.length; index++) {
+        const element = currLine[index];
+        if (element === '*') {
+          const adjacents = this.listAdjacentNumbers(lineIndex, index);
+          if (Array.isArray(adjacents) && adjacents.length === 2) {
+            listOfGearRatios.push([adjacents[0], adjacents[1]]);
+          }
+        }
+      }
+    }
+
+    return listOfGearRatios;
+  }
+
+  private listAdjacentNumbers(line: number, col: number): Array<number> {
+    const numsFound: Map<string, number> = new Map<string, number>();
+    const offsetArray: Array<[number, number]> = [
+      [-1, -1],
+      [-1, 0],
+      [-1, 1],
+      [0, -1],
+      [0, 1],
+      [1, -1],
+      [1, 0],
+      [1, 1]
+    ];
+    for (const offsetCouple of offsetArray) {
+      const elem = this._mapOfNumbers.get(line + offsetCouple[0])?.get(col + offsetCouple[1]);
+      if (elem) {
+        numsFound.set(elem[1], elem[0]);
+      }
+    }
+    return Array.from(numsFound.values());
   }
 }
 
@@ -391,6 +480,13 @@ export function sumOfAllPartNumbersSecondTry(filePath: string): number[] {
   return result;
 }
 
+export function sumOfAllGearRationsPart2(filePath: string): Array<[number, number]> {
+  const engineByLinesLines = getTextFileAsListOfLines(filePath);
+  const partNumbersRetrieverSecondTry = new PartNumbersRetrieverSecondTry(engineByLinesLines);
+  const result = partNumbersRetrieverSecondTry.listGearRatios();
+  return result;
+}
+
 export function startDay03() {
   const asciiArtLogger = getAsciiArtLogger('debug', 'Doom');
   const consoleLogger = getConsoleLogger('debug');
@@ -424,6 +520,14 @@ export function startDay03() {
   consoleLogger.info(`PART 1: ${sumPartNumbers}`);
 
   // PART 2
+  // const resPart2 = sumOfAllGearRationsPart2('data/day03/testInput01.txt');
+  const resPart2 = sumOfAllGearRationsPart2('data/day03/input01.txt');
+  let gearRatiosSum = 0;
+  for (const currGearRatios of resPart2) {
+    gearRatiosSum += currGearRatios[0] * currGearRatios[1];
+  }
+  consoleLogger.debug(`PART 2:\n${JSON.stringify(resPart2)}`);
+  consoleLogger.info(`PART 2: ${gearRatiosSum}`);
 }
 
 /*
