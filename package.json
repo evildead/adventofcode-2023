@@ -1,6 +1,6 @@
 {
   "name": "adventofcode-2023",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "engines": {
     "node": ">=16"
   },
@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@<repo-url>"
+    "url": "git@github.com:evildead/adventofcode-2023.git"
   },
   "keywords": [
     "Node.js",
