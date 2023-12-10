@@ -132,6 +132,28 @@ Seed 13, soil 13, fertilizer 52, water 41, light 34, temperature 34, humidity 35
 So, the lowest location number in this example is 35.
 
 What is the lowest location number that corresponds to any of the initial seed numbers?
+
+--- Part Two ---
+Everyone will starve if you only plant such a small number of seeds. Re-reading the almanac,
+it looks like the seeds: line actually describes ranges of seed numbers.
+
+The values on the initial seeds: line come in pairs. Within each pair, the first value is the
+start of the range and the second value is the length of the range. So, in the first line of
+the example above:
+
+seeds: 79 14 55 13
+This line describes two ranges of seed numbers to be planted in the garden.
+The first range starts with seed number 79 and contains 14 values: 79, 80, ..., 91, 92.
+The second range starts with seed number 55 and contains 13 values: 55, 56, ..., 66, 67.
+
+Now, rather than considering four seed numbers, you need to consider a total of 27 seed numbers.
+
+In the above example, the lowest location number can be obtained from seed number 82,
+which corresponds to soil 84, fertilizer 84, water 84, light 77, temperature 45, humidity 46,
+and location 46. So, the lowest location number is 46.
+
+Consider all of the initial seed numbers listed in the ranges on the first line of the almanac.
+What is the lowest location number that corresponds to any of the initial seed numbers?
 */
 
 type SeedsAndCoMapsType = {
@@ -168,8 +190,24 @@ enum SeedFertilizerFileReadModality {
   HUMIDITYTOLOCATION_READ = 'HUMIDITYTOLOCATION_READ'
 }
 
+type NumRange = {
+  start: number;
+  end: number;
+};
+
+type DestinationAndSourceRange = {
+  source: NumRange;
+  destination: NumRange;
+};
+
+type SeedFertilizerPart2ReturnType = {
+  ranges: Array<NumRange>;
+  minLocation: number | undefined;
+};
+
 class RangeMapper {
   private _input: Array<SeedsAndCoMapsType>;
+  private _destinationAndSourceRanges: Array<DestinationAndSourceRange>;
 
   constructor(input: Array<SeedsAndCoMapsType>) {
     this.setupInput(input);
@@ -177,6 +215,92 @@ class RangeMapper {
 
   private setupInput(input: Array<SeedsAndCoMapsType>) {
     this._input = input;
+    this._destinationAndSourceRanges = [];
+    for (const inputElement of this._input) {
+      this._destinationAndSourceRanges.push({
+        source: {
+          start: inputElement.sourceRange,
+          end: inputElement.sourceRange + inputElement.rangeLength - 1
+        },
+        destination: {
+          start: inputElement.destinationRange,
+          end: inputElement.destinationRange + inputElement.rangeLength - 1
+        }
+      });
+    }
+    if (this._destinationAndSourceRanges.length < 1) {
+      this._destinationAndSourceRanges.push({
+        source: {
+          start: 0,
+          end: Number.MAX_SAFE_INTEGER
+        },
+        destination: {
+          start: 0,
+          end: Number.MAX_SAFE_INTEGER
+        }
+      });
+    } else {
+      // Ascending order based on source.start
+      this._destinationAndSourceRanges.sort((a: DestinationAndSourceRange, b: DestinationAndSourceRange) => {
+        return a.source.start - b.source.start;
+      });
+      // check if it starts from 0
+      const firstRange = this._destinationAndSourceRanges[0];
+      if (firstRange.source.start > 0) {
+        // add range from 0 to firstRange.source.start - 1
+        const end = firstRange.source.start - 1;
+        this._destinationAndSourceRanges.unshift({
+          source: {
+            start: 0,
+            end
+          },
+          destination: {
+            start: 0,
+            end
+          }
+        });
+      }
+      const destinationAndSourceRangesToBeAdded: Array<DestinationAndSourceRange> = [];
+      let prevEnd: number | undefined;
+      for (let index = 0; index < this._destinationAndSourceRanges.length; index++) {
+        const currDestinationAndSourceRange = this._destinationAndSourceRanges[index];
+        if (!prevEnd) {
+          prevEnd = currDestinationAndSourceRange.source.end;
+          continue;
+        }
+        if (currDestinationAndSourceRange.source.start > prevEnd + 1) {
+          destinationAndSourceRangesToBeAdded.push({
+            source: {
+              start: prevEnd + 1,
+              end: Number(currDestinationAndSourceRange.source.start - 1)
+            },
+            destination: {
+              start: prevEnd + 1,
+              end: Number(currDestinationAndSourceRange.source.start - 1)
+            }
+          });
+        }
+        prevEnd = currDestinationAndSourceRange.source.end;
+      }
+      if (!prevEnd) {
+        throw new Error('There was an error with prevEnd');
+      }
+      destinationAndSourceRangesToBeAdded.push({
+        source: {
+          start: prevEnd + 1,
+          end: Number.MAX_SAFE_INTEGER
+        },
+        destination: {
+          start: prevEnd + 1,
+          end: Number.MAX_SAFE_INTEGER
+        }
+      });
+      this._destinationAndSourceRanges.push(...destinationAndSourceRangesToBeAdded);
+      // Ascending order based on source.start
+      this._destinationAndSourceRanges.sort((a: DestinationAndSourceRange, b: DestinationAndSourceRange) => {
+        return a.source.start - b.source.start;
+      });
+    }
   }
 
   public get(input: number): number {
@@ -190,6 +314,68 @@ class RangeMapper {
       }
     }
     return input;
+  }
+
+  public getListOfDestinationRanges(sourceRange: NumRange): Array<NumRange> {
+    const destRangeList: Array<NumRange> = [];
+
+    for (const destinationAndSourceRange of this._destinationAndSourceRanges) {
+      if (sourceRange.end < destinationAndSourceRange.source.start) {
+        break;
+      }
+      if (sourceRange.start > destinationAndSourceRange.source.end) {
+        continue;
+      }
+      if (
+        sourceRange.start >= destinationAndSourceRange.source.start &&
+        sourceRange.end <= destinationAndSourceRange.source.end
+      ) {
+        const startDiff = sourceRange.start - destinationAndSourceRange.source.start;
+        const endDiff = sourceRange.end - destinationAndSourceRange.source.end;
+        destRangeList.push({
+          start: destinationAndSourceRange.destination.start + startDiff,
+          end: destinationAndSourceRange.destination.end + endDiff
+        });
+        break;
+      }
+      if (
+        sourceRange.start < destinationAndSourceRange.source.start &&
+        sourceRange.end > destinationAndSourceRange.source.end
+      ) {
+        destRangeList.push({
+          start: destinationAndSourceRange.destination.start,
+          end: destinationAndSourceRange.destination.end
+        });
+        continue;
+      }
+      if (
+        sourceRange.start < destinationAndSourceRange.source.start &&
+        sourceRange.end <= destinationAndSourceRange.source.end
+      ) {
+        const endDiff = sourceRange.end - destinationAndSourceRange.source.end;
+        destRangeList.push({
+          start: destinationAndSourceRange.destination.start,
+          end: destinationAndSourceRange.destination.end + endDiff
+        });
+        break;
+      }
+      if (
+        sourceRange.start >= destinationAndSourceRange.source.start &&
+        sourceRange.end > destinationAndSourceRange.source.end
+      ) {
+        const startDiff = sourceRange.start - destinationAndSourceRange.source.start;
+        destRangeList.push({
+          start: destinationAndSourceRange.destination.start + startDiff,
+          end: destinationAndSourceRange.destination.end
+        });
+        continue;
+      }
+    }
+
+    if (destRangeList.length < 1) {
+      destRangeList.push(sourceRange);
+    }
+    return destRangeList;
   }
 }
 
@@ -306,7 +492,24 @@ class SeedFertilizer {
     return currInput;
   }
 
-  public calculateLocations(): SeedFertilizerPart1ReturnType {
+  private resolveRangeInputThroughConsecutiveMaps(sourceRanges: Array<NumRange>): Array<NumRange> {
+    let currInput = sourceRanges;
+    for (const currMap of this._consecutiveMaps) {
+      const currMapRanges: Array<NumRange> = [];
+      for (const currRange of currInput) {
+        const res = currMap.getListOfDestinationRanges(currRange);
+        if (res?.length > 0) {
+          currMapRanges.push(...res);
+        }
+      }
+      currInput = currMapRanges;
+    }
+    return currInput.sort((a: NumRange, b: NumRange) => {
+      return a.start - b.start;
+    });
+  }
+
+  public calculateLocationsPart1(): SeedFertilizerPart1ReturnType {
     const returnObj: SeedFertilizerPart1ReturnType = {
       locations: [],
       minLocation: undefined
@@ -320,12 +523,43 @@ class SeedFertilizer {
     }
     return returnObj;
   }
+
+  public calculateLocationsPart2(): SeedFertilizerPart2ReturnType {
+    const returnObj: SeedFertilizerPart2ReturnType = {
+      ranges: [],
+      minLocation: undefined
+    };
+    const inputListRanges: Array<NumRange> = [];
+    for (let seedNumIndex = 0; seedNumIndex < this._input.seeds.length - 1; seedNumIndex += 2) {
+      inputListRanges.push({
+        start: this._input.seeds[seedNumIndex],
+        end: this._input.seeds[seedNumIndex] + this._input.seeds[seedNumIndex + 1] - 1
+      });
+    }
+    const listRanges = this.resolveRangeInputThroughConsecutiveMaps(inputListRanges);
+    if (listRanges.length < 1) {
+      throw new Error('No destination ranges found');
+    }
+    returnObj.ranges.push(...listRanges);
+    const currMinLocation = listRanges[0].start;
+    if (returnObj.minLocation === undefined || returnObj.minLocation > currMinLocation) {
+      returnObj.minLocation = currMinLocation;
+    }
+    return returnObj;
+  }
 }
 
 export function seedFertilizerPart1(filePath: string): SeedFertilizerPart1ReturnType {
   const fileLines = getTextFileAsListOfLines(filePath);
   const seedFertilizer = new SeedFertilizer(fileLines);
-  const result = seedFertilizer.calculateLocations();
+  const result = seedFertilizer.calculateLocationsPart1();
+  return result;
+}
+
+export function seedFertilizerPart2(filePath: string): SeedFertilizerPart2ReturnType {
+  const fileLines = getTextFileAsListOfLines(filePath);
+  const seedFertilizer = new SeedFertilizer(fileLines);
+  const result = seedFertilizer.calculateLocationsPart2();
   return result;
 }
 
@@ -341,6 +575,10 @@ export function startDay05() {
   consoleLogger.info(`PART 1: ${resPart1.minLocation}`);
 
   // PART 2
+  // const resPart2 = seedFertilizerPart2('data/day05/testInput01.txt');
+  const resPart2 = seedFertilizerPart2('data/day05/input01.txt');
+  consoleLogger.debug(`PART 2:\n${JSON.stringify(resPart2, null, 2)}`);
+  consoleLogger.info(`PART 2: ${resPart2.minLocation}`);
 }
 
 /*
