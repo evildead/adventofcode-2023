@@ -1,6 +1,6 @@
 /* eslint-disable security/detect-object-injection */
 import { getAsciiArtLogger, getConsoleLogger, getFileLogger } from '../logger';
-import { getTextFileAsListOfLines } from '../utilities';
+import { getTextFileAsListOfLines, isEven } from '../utilities';
 
 /*
 --- Day 6: Wait For It ---
@@ -72,11 +72,36 @@ in this example, if you multiply these values together, you get 288 (4 * 8 * 9).
 
 Determine the number of ways you could beat the record in each race. What do you get if
 you multiply these numbers together?
+
+--- Part Two ---
+As the race is about to start, you realize the piece of paper with race times and record distances
+you got earlier actually just has very bad kerning.
+There's really only one race - ignore the spaces between the numbers on each line.
+
+So, the example from before:
+
+Time:      7  15   30
+Distance:  9  40  200
+...now instead means this:
+
+Time:      71530
+Distance:  940200
+Now, you have to figure out how many ways there are to win this single race.
+In this example, the race lasts for 71530 milliseconds and the record distance
+you need to beat is 940200 millimeters.
+You could hold the button anywhere from 14 to 71516 milliseconds and beat the record,
+a total of 71503 ways!
+
+How many ways can you beat the record in this one much longer race?
 */
 
 type WaitForItPart1ReturnType = {
   numOfWays: Array<number>;
   multiplicationValue: number;
+};
+
+type WaitForItPart2ReturnType = {
+  numOfWays: number;
 };
 
 type RaceInput = {
@@ -86,6 +111,7 @@ type RaceInput = {
 
 class NumOfWays {
   private _races: Array<RaceInput>;
+  private _bigRace: RaceInput;
 
   constructor(fileLines: Array<string>) {
     this.setupInput(fileLines);
@@ -131,6 +157,17 @@ class NumOfWays {
         distance: Number(arrayOfDistances[index])
       });
     }
+
+    let bigTime = '';
+    let bigDistance = '';
+    for (const currRace of this._races) {
+      bigTime += currRace.time;
+      bigDistance += currRace.distance;
+    }
+    this._bigRace = {
+      time: Number(bigTime),
+      distance: Number(bigDistance)
+    };
   }
 
   private static computeSingleRace(raceInput: RaceInput): number {
@@ -164,12 +201,29 @@ class NumOfWays {
 
     return output;
   }
+
+  public computeNumOfWaysPart2(): WaitForItPart2ReturnType {
+    const output: WaitForItPart2ReturnType = {
+      numOfWays: 0
+    };
+
+    output.numOfWays = NumOfWays.computeSingleRace(this._bigRace);
+
+    return output;
+  }
 }
 
 export function waitForItPart1(filePath: string): WaitForItPart1ReturnType {
   const fileLines = getTextFileAsListOfLines(filePath);
   const numOfWays = new NumOfWays(fileLines);
   const result = numOfWays.computeNumOfWaysPart1();
+  return result;
+}
+
+export function waitForItPart2(filePath: string): WaitForItPart2ReturnType {
+  const fileLines = getTextFileAsListOfLines(filePath);
+  const numOfWays = new NumOfWays(fileLines);
+  const result = numOfWays.computeNumOfWaysPart2();
   return result;
 }
 
@@ -185,6 +239,10 @@ export function startDay06() {
   consoleLogger.info(`PART 1: ${resPart1.multiplicationValue}`);
 
   // PART 2
+  // const resPart2 = waitForItPart2('data/day06/testInput01.txt');
+  const resPart2 = waitForItPart2('data/day06/input01.txt');
+  consoleLogger.debug(`PART 2:\n${JSON.stringify(resPart2, null, 2)}`);
+  consoleLogger.info(`PART 2: ${resPart2.numOfWays}`);
 }
 
 /*
