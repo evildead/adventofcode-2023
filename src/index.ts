@@ -5,6 +5,7 @@ import { startDay02 } from './day02';
 import { startDay03 } from './day03';
 import { startDay04 } from './day04';
 import { startDay05 } from './day05';
+import { startDay06 } from './day06';
 
 const asciiArtLogger = getAsciiArtLogger('info', 'Digital');
 const consoleLogger = getConsoleLogger('info');
@@ -17,5 +18,6 @@ asciiArtLogger.info('AdventOfCode-2023');
   startDay03();
   startDay04();
   startDay05();
+  startDay06();
   consoleLogger.info(christmasTree(7));
 })();
