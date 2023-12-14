@@ -1,7 +1,7 @@
 /* eslint-disable security/detect-object-injection */
 import { getAsciiArtLogger, getConsoleLogger } from '../logger';
 import { getTextFileAsListOfLines } from '../utilities';
-import { CamelCardsRank, CamelCardsRankResultPart1 } from './camelCardsRank';
+import { CamelCardsRank, CamelCardsRankResult, CamelCardClassicalMatch, CamelCardJokerMatch } from './camelCardsRank';
 
 /*
 --- Day 7: Camel Cards ---
@@ -84,11 +84,46 @@ with its rank (765 * 1 + 220 * 2 + 28 * 3 + 684 * 4 + 483 * 5). So the total win
 Find the rank of every hand in your set. What are the total winnings?
 
 To begin, get your puzzle input.
+
+--- Part Two ---
+To make things a little more interesting, the Elf introduces one additional rule.
+Now, J cards are jokers - wildcards that can act like whatever card would make the hand the strongest type possible.
+
+To balance this, J cards are now the weakest individual cards, weaker even than 2.
+The other cards stay in the same order: A, K, Q, T, 9, 8, 7, 6, 5, 4, 3, 2, J.
+
+J cards can pretend to be whatever card is best for the purpose of determining hand type;
+for example, QJJQ2 is now considered four of a kind. However, for the purpose of breaking
+ties between two hands of the same type, J is always treated as J, not the card it's pretending to be:
+JKKK2 is weaker than QQQQ2 because J is weaker than Q.
+
+Now, the above example goes very differently:
+
+32T3K 765
+T55J5 684
+KK677 28
+KTJJT 220
+QQQJA 483
+32T3K is still the only one pair; it doesn't contain any jokers, so its strength doesn't increase.
+KK677 is now the only two pair, making it the second-weakest hand.
+T55J5, KTJJT, and QQQJA are now all four of a kind! T55J5 gets rank 3, QQQJA gets rank 4, and KTJJT gets rank 5.
+With the new joker rule, the total winnings in this example are 5905.
+
+Using the new joker rule, find the rank of every hand in your set. What are the new total winnings?
 */
 
-export function camelCardsPart1(filePath: string): CamelCardsRankResultPart1 {
+export function camelCardsPart1(filePath: string): CamelCardsRankResult {
   const fileLines = getTextFileAsListOfLines(filePath);
-  const camelCardsRank = new CamelCardsRank(fileLines);
+  const strategy = new CamelCardClassicalMatch();
+  const camelCardsRank = new CamelCardsRank(fileLines, strategy);
+  const result = camelCardsRank.computeCardHandRank();
+  return result;
+}
+
+export function camelCardsPart2(filePath: string): CamelCardsRankResult {
+  const fileLines = getTextFileAsListOfLines(filePath);
+  const strategy = new CamelCardJokerMatch();
+  const camelCardsRank = new CamelCardsRank(fileLines, strategy);
   const result = camelCardsRank.computeCardHandRank();
   return result;
 }
@@ -105,6 +140,10 @@ export function startDay07() {
   consoleLogger.info(`PART 1: ${resPart1.totalWinnings}`);
 
   // PART 2
+  // const resPart2 = camelCardsPart2('data/day07/testInput01.txt');
+  const resPart2 = camelCardsPart2('data/day07/input01.txt');
+  consoleLogger.debug(`PART 2:\n${JSON.stringify(resPart2, null, 2)}`);
+  consoleLogger.info(`PART 2: ${resPart2.totalWinnings}`);
 }
 
 /*

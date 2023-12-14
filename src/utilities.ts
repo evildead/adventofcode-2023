@@ -1,4 +1,5 @@
 import { readFileSync } from 'fs';
+import _ from 'lodash';
 
 export function getTextFileAsListOfLines(filePath: string): Array<string> {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -63,4 +64,42 @@ export function isEven(num: number) {
 
 export function isOdd(num: number) {
   return (num & 1) === 1;
+}
+
+export type HighestLowestMapEntriesType<T> = {
+  highest: [T, number];
+  lowest: [T, number];
+};
+
+export function getHighestAndLowestMapEntries<T>(mapInput: Map<T, number>): HighestLowestMapEntriesType<T> | undefined {
+  let highestEntry: [T, number] | undefined;
+  let lowestEntry: [T, number] | undefined;
+
+  if (
+    !mapInput ||
+    typeof mapInput !== 'object' ||
+    typeof mapInput[Symbol.iterator] !== 'function' ||
+    !('size' in mapInput) ||
+    mapInput.size < 1
+  ) {
+    return undefined;
+  }
+
+  for (const [key, val] of mapInput) {
+    if (highestEntry === undefined || val > highestEntry[1]) {
+      highestEntry = [key, val];
+    }
+    if (lowestEntry === undefined || val < lowestEntry[1]) {
+      lowestEntry = [key, val];
+    }
+  }
+
+  if (highestEntry === undefined || lowestEntry === undefined) {
+    return undefined;
+  }
+
+  return {
+    highest: highestEntry,
+    lowest: lowestEntry
+  };
 }
