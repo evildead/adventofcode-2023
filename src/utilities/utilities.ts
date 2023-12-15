@@ -6,7 +6,10 @@ export function getTextFileAsListOfLines(filePath: string): Array<string> {
   return readFileSync(filePath).toString('utf-8').split('\n');
 }
 
-export function trimAny(str: string, chars: string) {
+export function trimAny(str: string, chars: string): string {
+  if (!_.isString(str) || !_.isString(chars)) {
+    return '';
+  }
   let start = 0;
   let end = str.length;
 
@@ -59,10 +62,16 @@ export function jsonParseReviverForMapObjects(key: string, value: any): any {
 }
 
 export function isEven(num: number) {
+  if (!_.isInteger(num)) {
+    return false;
+  }
   return (num & 1) === 0;
 }
 
 export function isOdd(num: number) {
+  if (!_.isInteger(num)) {
+    return false;
+  }
   return (num & 1) === 1;
 }
 
