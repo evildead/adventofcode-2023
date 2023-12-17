@@ -119,10 +119,17 @@ Analyze your OASIS report again, this time extrapolating the previous value for 
 What is the sum of these extrapolated values?
 */
 
-export function sumPfPredictionsPart1(filePath: string): ExtrapolatedValuesType {
+export function sumOfPredictionsPart1(filePath: string): ExtrapolatedValuesType {
   const fileLines = getTextFileAsListOfLines(filePath);
   const predictNextValue = new PredictNextValue(fileLines);
   const result = predictNextValue.computeSumOfPredictionsPart1();
+  return result;
+}
+
+export function sumOfPredictionsPart2(filePath: string): ExtrapolatedValuesType {
+  const fileLines = getTextFileAsListOfLines(filePath);
+  const predictNextValue = new PredictNextValue(fileLines);
+  const result = predictNextValue.computeSumOfPredictionsPart2();
   return result;
 }
 
@@ -133,12 +140,15 @@ export function startDay09() {
 
   // PART 1
   // const resPart1 = sumPfPredictionsPart1('data/day09/testInput01.txt');
-  const resPart1 = sumPfPredictionsPart1('data/day09/input01.txt');
+  const resPart1 = sumOfPredictionsPart1('data/day09/input01.txt');
   consoleLogger.debug(`PART 1: ${JSON.stringify(resPart1, null, 2)}`);
   consoleLogger.info(`PART 1: ${resPart1.sumOfExtrapolatedValues}`);
 
   // PART 2
-  consoleLogger.info(`PART 2: TO BE COMPLETED`);
+  // const resPart2 = sumOfPredictionsPart2('data/day09/testInput01.txt');
+  const resPart2 = sumOfPredictionsPart2('data/day09/input01.txt');
+  consoleLogger.debug(`PART 2: ${JSON.stringify(resPart2, null, 2)}`);
+  consoleLogger.info(`PART 2: ${resPart2.sumOfExtrapolatedValues}`);
 }
 
 /*
