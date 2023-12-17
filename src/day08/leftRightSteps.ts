@@ -49,7 +49,7 @@ export class LeftRightSteps {
     }
   }
 
-  public computeNumberOfSteps(): number {
+  public computeNumberOfStepsPart1(): number {
     const elementToBeFound = 'ZZZ';
     let elementFound = false;
     let lrDirectionsIndex = 0;
@@ -66,6 +66,53 @@ export class LeftRightSteps {
       ++numberOfSteps;
       if (currElement === elementToBeFound) {
         elementFound = true;
+      }
+      if (lrDirectionsIndex < this._lrDirections.length - 1) {
+        ++lrDirectionsIndex;
+      } else {
+        lrDirectionsIndex = 0;
+      }
+    }
+    return numberOfSteps;
+  }
+
+  public computeNumberOfStepsPart2CorrectButTooSlow(): number {
+    const lastLetterInitialNodes = 'A';
+    const lastLetterFinalNodes = 'Z';
+    let allNodesEndingWithZ = false;
+    let lrDirectionsIndex = 0;
+    let numberOfSteps = 0;
+    let currElements: Array<string> = Array.from(this._mapOfLeftRightElements.keys()).reduce(
+      (prev: Array<string>, current: string): Array<string> => {
+        if (current.at(current.length - 1) === lastLetterInitialNodes) {
+          prev.push(current);
+        }
+        return prev;
+      },
+      []
+    );
+    let currDirection: string | undefined;
+    while (!allNodesEndingWithZ) {
+      currDirection = this._lrDirections.at(lrDirectionsIndex);
+      const lrElementsList = currElements.map((currElement: string) => {
+        const lrElements = this._mapOfLeftRightElements.get(currElement);
+        if (lrElements === undefined || currDirection === undefined) {
+          throw new Error('Impossible to follow the direction');
+        }
+        return lrElements;
+      });
+      currElements = lrElementsList.map((lrElements: LeftRightElements) => {
+        const currElement = currDirection === 'L' ? lrElements.left : lrElements.right;
+        return currElement;
+      });
+      ++numberOfSteps;
+      // check nodes
+      allNodesEndingWithZ = true;
+      for (const currElement of currElements) {
+        if (currElement.at(currElement.length - 1) !== lastLetterFinalNodes) {
+          allNodesEndingWithZ = false;
+          break;
+        }
       }
       if (lrDirectionsIndex < this._lrDirections.length - 1) {
         ++lrDirectionsIndex;
