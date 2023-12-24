@@ -1,6 +1,7 @@
 /* eslint-disable security/detect-object-injection */
 import { getAsciiArtLogger, getConsoleLogger } from '../logger';
 import { getTextFileAsListOfLines } from '../utilities';
+import { GiantLoop, GiantLoopStepsToFarthestPointResponseType } from './giantLoop';
 
 /*
 --- Day 10: Pipe Maze ---
@@ -118,13 +119,24 @@ Find the single giant loop starting at S. How many steps along the loop does it 
 starting position to the point farthest from the starting position?
 */
 
+export function stepToFarthestPointOfTheLoopPart1(filePath: string): GiantLoopStepsToFarthestPointResponseType {
+  const fileLines = getTextFileAsListOfLines(filePath);
+  const giantLoop = new GiantLoop(fileLines);
+  const result = giantLoop.computeStepsToTheFarthestPointPart1();
+  return result;
+}
+
 export function startDay10() {
   const asciiArtLogger = getAsciiArtLogger('debug', 'Doom');
   const consoleLogger = getConsoleLogger('debug');
   asciiArtLogger.info('Day 10');
 
   // PART 1
-  consoleLogger.info(`PART 1: TO BE COMPLETED`);
+  // const resPart1 = stepToFarthestPointOfTheLoopPart1('data/day10/testInput01.txt');
+  // const resPart1 = stepToFarthestPointOfTheLoopPart1('data/day10/testInput02.txt');
+  const resPart1 = stepToFarthestPointOfTheLoopPart1('data/day10/input01.txt');
+  consoleLogger.debug(`PART 1: ${JSON.stringify(resPart1)}`);
+  consoleLogger.info(`PART 1: ${resPart1.numberOfStepsToFarthestPoint}`);
 
   // PART 2
   consoleLogger.info(`PART 2: TO BE COMPLETED`);
@@ -132,6 +144,6 @@ export function startDay10() {
 
 /*
 (() => {
-  startDay09();
+  startDay10();
 })();
 */
