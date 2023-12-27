@@ -25,7 +25,7 @@ export class DanMatrix<T> {
           if (!Array.isArray(row) || row.length < 1 || (prevRowLength !== undefined && prevRowLength !== row.length)) {
             throw new Error('Wrong input');
           }
-          this._2dvector.push(row);
+          this._2dvector.push(_.cloneDeep(row));
           prevRowLength = row.length;
         }
       } else {
@@ -37,6 +37,11 @@ export class DanMatrix<T> {
         }
       }
     }
+  }
+
+  public clone(): DanMatrix<T> {
+    const clonedMatrix: DanMatrix<T> = new DanMatrix<T>(this._2dvector);
+    return clonedMatrix;
   }
 
   public getMatrixString(fixedSpacing: number = 15): string {
@@ -107,10 +112,10 @@ export class DanMatrix<T> {
     }
     if (this._2dvector.length > 0 && row.length !== this._2dvector[0].length) {
       throw new Error(
-        `Input row's length ${row.length}, differs from matrix's num of columns ${this._2dvector[0].length}`
+        `Input row's length ${row.length} differs from matrix's num of columns ${this._2dvector[0].length}`
       );
     }
-    this._2dvector.push(row);
+    this._2dvector.push(_.cloneDeep(row));
   }
 
   public addColumn(column: Array<T>): void {
@@ -120,7 +125,7 @@ export class DanMatrix<T> {
     if (this._2dvector.length > 0) {
       if (column.length !== this._2dvector.length) {
         throw new Error(
-          `Input column's length ${column.length}, differs from matrix's num of rows ${this._2dvector.length}`
+          `Input column's length ${column.length} differs from matrix's num of rows ${this._2dvector.length}`
         );
       }
       for (let rowIndex = 0; rowIndex < this._2dvector.length; rowIndex++) {
@@ -146,5 +151,102 @@ export class DanMatrix<T> {
       }
     }
     return coordsArray;
+  }
+
+  public getRowAt(rowIndex: number): Array<T> | undefined {
+    if (!_.isInteger(rowIndex) || rowIndex < 0) {
+      throw new Error('Wrong input');
+    }
+    if (rowIndex >= this._2dvector.length) {
+      return undefined;
+    }
+    return _.cloneDeep(this._2dvector[rowIndex]);
+  }
+
+  public insertRowAt(rowIndex: number, row: Array<T>): void {
+    if (!_.isInteger(rowIndex) || rowIndex < 0 || !Array.isArray(row) || row.length < 1) {
+      throw new Error('Wrong input');
+    }
+    if (rowIndex > this._2dvector.length) {
+      throw new Error(`Cannot insert row at index ${rowIndex}`);
+    }
+    if (rowIndex === this._2dvector.length) {
+      return this.addRow(row);
+    }
+    if (row.length !== this._2dvector[0].length) {
+      throw new Error(
+        `Input row's length ${row.length}, differs from matrix's num of columns ${this._2dvector[0].length}`
+      );
+    }
+    this._2dvector.splice(rowIndex, 0, _.cloneDeep(row));
+  }
+
+  public getColumnAt(columnIndex: number): Array<T> | undefined {
+    if (!_.isInteger(columnIndex) || columnIndex < 0) {
+      throw new Error('Wrong input');
+    }
+    if (this._2dvector.length < 1) {
+      return undefined;
+    }
+    if (columnIndex >= this._2dvector[0].length) {
+      return undefined;
+    }
+    const columnToReturn: Array<T> = [];
+    for (let rowIndex = 0; rowIndex < this._2dvector.length; rowIndex++) {
+      columnToReturn.push(this._2dvector[rowIndex][columnIndex]);
+    }
+    return columnToReturn;
+  }
+
+  public insertColumnAt(columnIndex: number, column: Array<T>): void {
+    if (!_.isInteger(columnIndex) || columnIndex < 0 || !Array.isArray(column) || column.length < 1) {
+      throw new Error('Wrong input');
+    }
+    if (this._2dvector.length > 0) {
+      if (column.length !== this._2dvector.length) {
+        throw new Error(
+          `Input column's length ${column.length}, differs from matrix's num of rows ${this._2dvector.length}`
+        );
+      }
+      if (columnIndex > this._2dvector[0].length) {
+        throw new Error(`Cannot insert column at index ${columnIndex}`);
+      } else if (columnIndex === this._2dvector[0].length) {
+        return this.addColumn(column);
+      } else {
+        for (let rowIndex = 0; rowIndex < this._2dvector.length; rowIndex++) {
+          const row = this._2dvector[rowIndex];
+          row.splice(columnIndex, 0, column[rowIndex]);
+        }
+      }
+    } else {
+      if (columnIndex === 0) {
+        return this.addColumn(column);
+      } else {
+        throw new Error(`Cannot insert column at index ${columnIndex}`);
+      }
+    }
+  }
+
+  public removeRowAt(rowIndex: number): void {
+    if (!_.isInteger(rowIndex) || rowIndex < 0) {
+      throw new Error('Wrong input');
+    }
+    if (rowIndex >= this._2dvector.length) {
+      throw new Error(`Cannot remove row at index ${rowIndex}`);
+    }
+    this._2dvector.splice(rowIndex, 1);
+  }
+
+  public removeColumnAt(columnIndex: number): void {
+    if (!_.isInteger(columnIndex) || columnIndex < 0) {
+      throw new Error('Wrong input');
+    }
+    if (this._2dvector.length < 1 || columnIndex >= this._2dvector[0].length) {
+      throw new Error(`Cannot remove column at index ${columnIndex}`);
+    }
+    for (let rowIndex = 0; rowIndex < this._2dvector.length; rowIndex++) {
+      const row = this._2dvector[rowIndex];
+      row.splice(columnIndex, 1);
+    }
   }
 }

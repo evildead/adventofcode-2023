@@ -285,4 +285,229 @@ describe('Matrix', () => {
     const coordsArray0302 = myMatrix03.lookForValue('cccc');
     expect(coordsArray0302.length).toBe(1);
   });
+
+  it('check insertRowAt and getRowAt', async () => {
+    const myMatrix01 = new DanMatrix<string>({
+      rows: 2,
+      columns: 3,
+      val: '@'
+    });
+    expect(myMatrix01.rowsNum()).toBe(2);
+    expect(myMatrix01.colsNum()).toBe(3);
+    const rowToInsert01 = ['1', '2', '3'];
+    myMatrix01.insertRowAt(0, rowToInsert01);
+    expect(myMatrix01.rowsNum()).toBe(3);
+    expect(myMatrix01.colsNum()).toBe(3);
+    expect(myMatrix01.getRowAt(0)).toEqual(rowToInsert01);
+    expect(myMatrix01.get(1, 2)).toBe('@');
+    expect(myMatrix01.getCoord('0-1')).toBe('2');
+    expect(myMatrix01.get(2, 2)).toBe('@');
+
+    const myMatrix02 = new DanMatrix<number>([
+      [763, 23, 87, 123],
+      [244, 68563, 1, 557]
+    ]);
+    expect(myMatrix02.rowsNum()).toBe(2);
+    expect(myMatrix02.colsNum()).toBe(4);
+    const rowToInsert02 = [1, 2, 3, 4];
+    myMatrix02.insertRowAt(1, rowToInsert02);
+    expect(myMatrix02.rowsNum()).toBe(3);
+    expect(myMatrix02.colsNum()).toBe(4);
+    expect(myMatrix02.getRowAt(1)).toEqual(rowToInsert02);
+    expect(myMatrix02.get(1, 2)).toBe(3);
+    expect(myMatrix02.getCoord('0-1')).toBe(23);
+    expect(myMatrix02.get(2, 3)).toBe(557);
+    console.log(myMatrix02.getMatrixString(8));
+
+    const myMatrix03 = new DanMatrix<string>([
+      ['a', 'aa', 'aaa', 'aaaa', 'aaaaa', 'aaaaaa'],
+      ['b', 'bb', 'bbb', 'bbbb', 'bbbbb', 'bbbbbb'],
+      ['c', 'cc', 'ccc', 'cccc', 'ccccc', 'cccccc']
+    ]);
+    expect(myMatrix03.rowsNum()).toBe(3);
+    expect(myMatrix03.colsNum()).toBe(6);
+    const rowToInsert03 = ['d', 'dd', 'ddd', 'dddd', 'ddddd', 'dddddd'];
+    myMatrix03.insertRowAt(2, rowToInsert03);
+    expect(myMatrix03.rowsNum()).toBe(4);
+    expect(myMatrix03.colsNum()).toBe(6);
+    expect(myMatrix03.getRowAt(2)).toEqual(rowToInsert03);
+    expect(myMatrix03.get(1, 2)).toBe('bbb');
+    expect(myMatrix03.getCoord('2-4')).toBe('ddddd');
+    expect(myMatrix03.get(5, 9)).toBeUndefined();
+    console.log(myMatrix03.getMatrixString());
+
+    expect(() => {
+      const myMatrix = new DanMatrix<number>();
+      myMatrix.setupMatrix([
+        [763, 23, 87],
+        [244, 68563, 1]
+      ]);
+      myMatrix.insertRowAt(1, [344, 65, 87, 98, 12]);
+    }).toThrow();
+
+    expect(() => {
+      const myMatrix = new DanMatrix<number>();
+      myMatrix.setupMatrix([
+        [76, 3, 7],
+        [24, 6863, 11],
+        [2, 63, 411]
+      ]);
+      myMatrix.getRowAt(1.5);
+    }).toThrow();
+  });
+
+  it('check insertColumnAt and getColumnAt', async () => {
+    const myMatrix01 = new DanMatrix<string>({
+      rows: 2,
+      columns: 3,
+      val: '@'
+    });
+    expect(myMatrix01.rowsNum()).toBe(2);
+    expect(myMatrix01.colsNum()).toBe(3);
+    const columnToInsert01 = ['1', '2'];
+    myMatrix01.insertColumnAt(0, columnToInsert01);
+    expect(myMatrix01.rowsNum()).toBe(2);
+    expect(myMatrix01.colsNum()).toBe(4);
+    expect(myMatrix01.getColumnAt(0)).toEqual(columnToInsert01);
+    expect(myMatrix01.get(1, 0)).toBe('2');
+    expect(myMatrix01.getCoord('0-0')).toBe('1');
+    expect(myMatrix01.get(2, 2)).toBeUndefined();
+    console.log(myMatrix01.getMatrixString(4));
+
+    const myMatrix02 = new DanMatrix<number>([
+      [763, 23, 87, 123],
+      [244, 68563, 928, 557]
+    ]);
+    expect(myMatrix02.rowsNum()).toBe(2);
+    expect(myMatrix02.colsNum()).toBe(4);
+    const columnToInsert02 = [1, 2];
+    myMatrix02.insertColumnAt(1, columnToInsert02);
+    expect(myMatrix02.rowsNum()).toBe(2);
+    expect(myMatrix02.colsNum()).toBe(5);
+    expect(myMatrix02.getColumnAt(1)).toEqual(columnToInsert02);
+    expect(myMatrix02.get(1, 1)).toBe(2);
+    expect(myMatrix02.getCoord('0-1')).toBe(1);
+    expect(myMatrix02.get(2, 3)).toBeUndefined();
+    console.log(myMatrix02.getMatrixString(8));
+
+    const myMatrix03 = new DanMatrix<string>([
+      ['a', 'aa', 'aaa', 'aaaa', 'aaaaa', 'aaaaaa'],
+      ['b', 'bb', 'bbb', 'bbbb', 'bbbbb', 'bbbbbb'],
+      ['c', 'cc', 'ccc', 'cccc', 'ccccc', 'cccccc']
+    ]);
+    expect(myMatrix03.rowsNum()).toBe(3);
+    expect(myMatrix03.colsNum()).toBe(6);
+    const columnToInsert03 = ['AAAAAAA', 'BBBBBBB', 'CCCCCCC'];
+    myMatrix03.insertColumnAt(6, columnToInsert03);
+    expect(myMatrix03.rowsNum()).toBe(3);
+    expect(myMatrix03.colsNum()).toBe(7);
+    expect(myMatrix03.getColumnAt(6)).toEqual(columnToInsert03);
+    expect(myMatrix03.get(1, 6)).toBe('BBBBBBB');
+    expect(myMatrix03.getCoord('2-6')).toBe('CCCCCCC');
+    expect(myMatrix03.get(5, 9)).toBeUndefined();
+    console.log(myMatrix03.getMatrixString());
+
+    expect(() => {
+      const myMatrix = new DanMatrix<number>();
+      myMatrix.setupMatrix([
+        [763, 23, 87],
+        [244, 68563, 1]
+      ]);
+      myMatrix.insertColumnAt(1, [344, 65, 87, 98, 12]);
+    }).toThrow();
+
+    expect(() => {
+      const myMatrix = new DanMatrix<number>();
+      myMatrix.setupMatrix([
+        [76, 3, 7],
+        [24, 6863, 11],
+        [2, 63, 411]
+      ]);
+      myMatrix.getColumnAt(-3);
+    }).toThrow();
+  });
+
+  it('check removeRowAt and removeColumnAt', async () => {
+    const myMatrix01 = new DanMatrix<string>([
+      ['a', 'aa', 'aaa', 'aaaa', 'aaaaa', 'aaaaaa'],
+      ['b', 'bb', 'bbb', 'bbbb', 'bbbbb', 'bbbbbb'],
+      ['c', 'cc', 'ccc', 'cccc', 'ccccc', 'cccccc'],
+      ['d', 'dd', 'ddd', 'dddd', 'ddddd', 'dddddd'],
+      ['e', 'ee', 'eee', 'eeee', 'eeeee', 'eeeeee'],
+      ['f', 'ff', 'fff', 'ffff', 'fffff', 'ffffff']
+    ]);
+    expect(myMatrix01.rowsNum()).toBe(6);
+    expect(myMatrix01.colsNum()).toBe(6);
+    myMatrix01.removeColumnAt(2);
+    expect(myMatrix01.rowsNum()).toBe(6);
+    expect(myMatrix01.colsNum()).toBe(5);
+    myMatrix01.removeRowAt(3);
+    expect(myMatrix01.rowsNum()).toBe(5);
+    expect(myMatrix01.colsNum()).toBe(5);
+    console.log(myMatrix01.getMatrixString());
+    myMatrix01.removeRowAt(4);
+    myMatrix01.removeColumnAt(4);
+    expect(myMatrix01.rowsNum()).toBe(4);
+    expect(myMatrix01.colsNum()).toBe(4);
+    console.log(myMatrix01.getMatrixString());
+    myMatrix01.removeColumnAt(1);
+    myMatrix01.removeRowAt(1);
+    expect(myMatrix01.rowsNum()).toBe(3);
+    expect(myMatrix01.colsNum()).toBe(3);
+    myMatrix01.removeColumnAt(0);
+    myMatrix01.removeRowAt(0);
+    expect(myMatrix01.rowsNum()).toBe(2);
+    expect(myMatrix01.colsNum()).toBe(2);
+    console.log(myMatrix01.getMatrixString());
+
+    expect(() => {
+      const myMatrix = new DanMatrix<number>();
+      myMatrix.setupMatrix([
+        [76, 3, 7],
+        [24, 6863, 11],
+        [2, 63, 411]
+      ]);
+      myMatrix.removeColumnAt(5);
+    }).toThrow();
+
+    expect(() => {
+      const myMatrix = new DanMatrix<number>();
+      myMatrix.setupMatrix([
+        [763, 23, 87],
+        [244, 68563, 1]
+      ]);
+      myMatrix.removeRowAt(4);
+    }).toThrow();
+  });
+
+  it('check clone', async () => {
+    const myMatrix01 = new DanMatrix<string>([
+      ['a', 'aa', 'aaa', 'aaaa', 'aaaaa', 'aaaaaa'],
+      ['b', 'bb', 'bbb', 'bbbb', 'bbbbb', 'bbbbbb'],
+      ['c', 'cc', 'ccc', 'cccc', 'ccccc', 'cccccc'],
+      ['d', 'dd', 'ddd', 'dddd', 'ddddd', 'dddddd'],
+      ['e', 'ee', 'eee', 'eeee', 'eeeee', 'eeeeee'],
+      ['f', 'ff', 'fff', 'ffff', 'fffff', 'ffffff']
+    ]);
+
+    const myMatrix02 = myMatrix01.clone();
+    expect(myMatrix01.rowsNum()).toBe(myMatrix02.rowsNum());
+    expect(myMatrix01.colsNum()).toBe(myMatrix02.colsNum());
+    for (let rowIndex = 0; rowIndex < myMatrix01.rowsNum(); rowIndex++) {
+      expect(myMatrix01.getRowAt(rowIndex)).toEqual(myMatrix02.getRowAt(rowIndex));
+    }
+    myMatrix01.set(0, 0, 'A');
+    expect(myMatrix01.get(0, 0)).toBe('A');
+    expect(myMatrix02.get(0, 0)).toBe('a');
+
+    myMatrix02.set(4, 2, 'EEE');
+    expect(myMatrix01.get(4, 2)).toBe('eee');
+    expect(myMatrix02.get(4, 2)).toBe('EEE');
+
+    myMatrix01.set(2, 5, 'CCCCCC');
+    expect(myMatrix01.get(2, 5)).toBe('CCCCCC');
+    expect(myMatrix02.get(2, 5)).toBe('cccccc');
+    console.log(myMatrix01.getMatrixString());
+    console.log(myMatrix02.getMatrixString());
+  });
 });
