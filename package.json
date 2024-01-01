@@ -1,6 +1,6 @@
 {
   "name": "adventofcode-2023",
-  "version": "1.13.0",
+  "version": "1.13.1",
   "engines": {
     "node": ">=18"
   },
@@ -14,7 +14,8 @@
     "build": "npm run clean && tsc && npm i --package-lock-only",
     "test": "jest --watchAll=false --coverage --coverageReporters=html",
     "test:ci": "jest --watchAll=false --coverage --ci --reporters=jest-junit --reporters=default",
-    "lint-fix": "eslint ./src --fix --cache"
+    "lint-fix": "eslint ./src --fix --cache",
+    "format": "prettier --write ."
   },
   "repository": {
     "type": "git",
