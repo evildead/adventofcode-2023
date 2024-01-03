@@ -1,0 +1,13 @@
+export { startDay01 } from './day01';
+export { startDay02 } from './day02';
+export { startDay03 } from './day03';
+export { startDay04 } from './day04';
+export { startDay05 } from './day05';
+export { startDay06 } from './day06';
+export { startDay07 } from './day07';
+export { startDay08 } from './day08';
+export { startDay09 } from './day09';
+export { startDay10 } from './day10';
+export { startDay11 } from './day11';
+export { startDay12 } from './day12';
+export { startDay13 } from './day13';
