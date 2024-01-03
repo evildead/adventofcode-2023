@@ -1,6 +1,6 @@
 /* eslint-disable security/detect-object-injection */
 import { DirectedGraph, CDanNode, CDanArc, DanArc } from 'dangraph';
-import { DanMatrix } from '../utilities/danMatrix';
+import { DanMatrix } from '../utilities';
 
 export type GiantLoopStepsToFarthestPointResponseType = {
   loopNodes: Array<string>;

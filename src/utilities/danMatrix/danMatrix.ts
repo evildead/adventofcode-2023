@@ -1,6 +1,8 @@
 /* eslint-disable security/detect-object-injection */
 import _ from 'lodash';
 
+import { DanMatrixRowsIterator, DanMatrixColumnsIterator } from '.';
+
 export interface RowsColsFilledWithValType<T> {
   rows: number;
   columns: number;
@@ -248,5 +250,21 @@ export class DanMatrix<T> {
       const row = this._2dvector[rowIndex];
       row.splice(columnIndex, 1);
     }
+  }
+
+  /**
+   * Get matrix rows iterator
+   * @returns {DanMatrixRowsIterator<T>} the matrix rows iterator
+   */
+  public getRowsIterator(): DanMatrixRowsIterator<T> {
+    return new DanMatrixRowsIterator<T>(this);
+  }
+
+  /**
+   * Get matrix columns iterator
+   * @returns {DanMatrixColumnsIterator<T>} the matrix columns iterator
+   */
+  public getColumnsIterator(): DanMatrixColumnsIterator<T> {
+    return new DanMatrixColumnsIterator<T>(this);
   }
 }

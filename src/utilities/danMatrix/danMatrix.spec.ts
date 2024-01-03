@@ -1,4 +1,4 @@
-import { DanMatrix } from './danMatrix';
+import { DanMatrix } from '.';
 
 describe('Matrix', () => {
   it('check the constructor with correct parameters', async () => {
@@ -509,5 +509,30 @@ describe('Matrix', () => {
     expect(myMatrix02.get(2, 5)).toBe('cccccc');
     console.log(myMatrix01.getMatrixString());
     console.log(myMatrix02.getMatrixString());
+  });
+
+  it('check rows and columns iterators', async () => {
+    const myMatrix01 = new DanMatrix<string>([
+      ['a', 'aa', 'aaa', 'aaaa', 'aaaaa', 'aaaaaa'],
+      ['b', 'bb', 'bbb', 'bbbb', 'bbbbb', 'bbbbbb'],
+      ['c', 'cc', 'ccc', 'cccc', 'ccccc', 'cccccc'],
+      ['d', 'dd', 'ddd', 'dddd', 'ddddd', 'dddddd'],
+      ['e', 'ee', 'eee', 'eeee', 'eeeee', 'eeeeee'],
+      ['f', 'ff', 'fff', 'ffff', 'fffff', 'ffffff']
+    ]);
+
+    let forLoopRowsIterations = 0;
+    for (const row of myMatrix01.getRowsIterator()) {
+      ++forLoopRowsIterations;
+      expect(row.length).toEqual(myMatrix01.colsNum());
+    }
+    expect(forLoopRowsIterations).toEqual(myMatrix01.rowsNum());
+
+    let forLoopColumnsIterations = 0;
+    for (const column of myMatrix01.getColumnsIterator()) {
+      ++forLoopColumnsIterations;
+      expect(column.length).toEqual(myMatrix01.rowsNum());
+    }
+    expect(forLoopColumnsIterations).toEqual(myMatrix01.colsNum());
   });
 });

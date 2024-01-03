@@ -9,5 +9,4 @@ export {
   trimAny
 } from './utilities';
 export type { HighestLowestMapEntriesType } from './utilities';
-export { DanMatrix } from './danMatrix';
-export type { DanMatrixConstructorType as MatrixConstructorType, RowsColsFilledWithValType } from './danMatrix';
+export * from './danMatrix';
