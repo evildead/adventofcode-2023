@@ -12,3 +12,4 @@ export { startDay11 } from './day11';
 export { startDay12 } from './day12';
 export { startDay13 } from './day13';
 export { startDay14 } from './day14';
+export { startDay15 } from './day15';
