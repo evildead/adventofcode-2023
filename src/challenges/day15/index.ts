@@ -1,7 +1,7 @@
 /* eslint-disable security/detect-object-injection */
 import { getAsciiArtLogger, getConsoleLogger } from '../../logger';
 import { getTextFileAsListOfLines } from '../../utilities';
-import { LensLibrary, HashAlgorithmResults } from './lensLibrary';
+import { LensLibrary, HashAlgorithmResults, FocusingPowerResult } from './lensLibrary';
 
 /*
 --- Day 15: Lens Library ---
@@ -202,6 +202,13 @@ export function sumHashAlgorithmResultsPart1(filePath: string): HashAlgorithmRes
   return result;
 }
 
+export function focusingPowerPart2(filePath: string): FocusingPowerResult {
+  const fileLines = getTextFileAsListOfLines(filePath);
+  const lensLibrary = new LensLibrary(fileLines[0]);
+  const result = lensLibrary.focusingPowerPart2();
+  return result;
+}
+
 export function startDay15() {
   const asciiArtLogger = getAsciiArtLogger('debug', 'Doom');
   const consoleLogger = getConsoleLogger('debug');
@@ -214,7 +221,10 @@ export function startDay15() {
   consoleLogger.info(`PART 1: ${resPart1.sumOfResults}`);
 
   // PART 2
-  consoleLogger.info(`PART 2: TO BE COMPLETED`);
+  // const resPart2 = focusingPowerPart2('data/day15/testInput01.txt');
+  const resPart2 = focusingPowerPart2('data/day15/input01.txt');
+  consoleLogger.debug(`PART 2: ${JSON.stringify(resPart2, null, 2)}`);
+  consoleLogger.info(`PART 2: ${resPart2.totalFocusingPower}`);
 }
 
 /*
