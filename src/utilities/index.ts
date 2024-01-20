@@ -9,4 +9,3 @@ export {
   trimAny
 } from './utilities';
 export type { HighestLowestMapEntriesType } from './utilities';
-export * from './danMatrix';

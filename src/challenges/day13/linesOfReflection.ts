@@ -1,5 +1,5 @@
 /* eslint-disable security/detect-object-injection */
-import { DanMatrix } from '../../utilities';
+import { DanMatrix } from 'danmatrix';
 
 export enum LineOfReflectionType {
   row = 'row',

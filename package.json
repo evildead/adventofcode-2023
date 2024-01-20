@@ -1,6 +1,6 @@
 {
   "name": "adventofcode-2023",
-  "version": "1.16.1",
+  "version": "1.16.2",
   "engines": {
     "node": ">=18"
   },
@@ -60,6 +60,7 @@
   },
   "dependencies": {
     "dangraph": "^2.0.0",
+    "danmatrix": "^1.1.1",
     "figlet": "^1.7.0",
     "lodash": "^4.17.21",
     "uuid": "^9.0.1"
