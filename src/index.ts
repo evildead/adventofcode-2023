@@ -15,7 +15,8 @@ import {
   startDay12,
   startDay13,
   startDay14,
-  startDay15
+  startDay15,
+  startDay16
 } from './challenges';
 
 const asciiArtLogger = getAsciiArtLogger('info', 'Digital');
@@ -39,5 +40,6 @@ asciiArtLogger.info('AdventOfCode-2023');
   startDay13();
   startDay14();
   startDay15();
+  await startDay16();
   consoleLogger.info(christmasTree(7));
 })();
